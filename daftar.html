@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Kursus</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body onload="playAudio(); getTime();">
+    <audio id="background-audio" src="musik-latar.mp3" autoplay loop></audio>
+
+    <header>
+        <h1>Formulir Pendaftaran Kursus</h1>
+    </header>
+
+    <nav>
+        <a href="index.html">
+            <svg width="20" height="20" fill="white" viewBox="0 0 24 24">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+            </svg> Home
+        </a>
+        <a href="daftar.html">
+            <svg width="20" height="20" fill="white" viewBox="0 0 24 24">
+                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+            </svg> Daftar Kursus
+        </a>
+        <a href="pilih.html">
+            <svg width="20" height="20" fill="white" viewBox="0 0 24 24">
+                <path d="M3 17v2h6v-2H3zm0-5v2h12v-2H3zm0-5v2h18V7H3z" />
+            </svg> Pilih Jadwal
+        </a>
+    </nav>
+
+    <main>
+        <form id="form-daftar">
+            <label for="nik">NIK:</label><br>
+            <input type="text" id="nik" name="nik" required><br><br>
+
+            <label for="nama">Nama:</label><br>
+            <input type="text" id="nama" name="nama" required><br><br>
+
+            <label for="alamat">Alamat:</label><br>
+            <textarea id="alamat" name="alamat" rows="3" required></textarea><br><br>
+
+            <label>Jenis Kelamin:</label>
+            <div class="gender-group">
+                <label><input type="radio" name="gender" value="Laki-laki" required> Laki-laki</label>
+                <label><input type="radio" name="gender" value="Perempuan"> Perempuan</label>
+            </div>
+
+
+            <button type="submit">Daftar</button>
+        </form>
+
+        <div id="output" style="margin-top: 2rem;"></div>
+
+        <div class="info-api">
+            <img src="media/jam.png" alt="Jam">
+            <span id="waktu">Memuat jam...</span>
+            <img src="cuaca-icon.png" alt="Cuaca" id="cuaca-icon" style="margin-left: 1rem;">
+            <span id="cuaca">Memuat cuaca...</span>
+        </div>
+
+    </main>
+
+    <footer>
+        &copy; 2025 Kursus Online Adriel. All rights reserved.
+    </footer>
+
+    <script>
+        function playAudio() {
+            const audio = document.getElementById("background-audio");
+            audio.play().catch(() => { });
+        }
+
+        function getTime() {
+            setInterval(() => {
+                const waktu = new Date().toLocaleTimeString('id-ID', {
+                    hour: '2-digit', minute: '2-digit', second: '2-digit'
+                });
+                document.getElementById("waktu").textContent = `Waktu : ${waktu}`;
+            }, 1000);
+        }
+        function getWeather() {
+            fetch('https://api.open-meteo.com/v1/forecast?latitude=-6.2&longitude=106.8&current_weather=true')
+                .then(response => response.json())
+                .then(data => {
+                    const suhu = data.current_weather.temperature;
+                    document.getElementById("cuaca").textContent = `Suhu : ${suhu}°C`;
+                    document.getElementById("cuaca-icon").src = "https://cdn-icons-png.flaticon.com/512/869/869869.png";
+                })
+                .catch(() => {
+                    document.getElementById("cuaca").textContent = "Gagal memuat cuaca";
+                });
+        }
+
+        document.getElementById("form-daftar").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const nik = document.getElementById("nik").value;
+            const nama = document.getElementById("nama").value;
+            const alamat = document.getElementById("alamat").value;
+            const gender = document.querySelector("input[name='gender']:checked").value;
+
+            const output = document.getElementById("output");
+            output.innerHTML = `
+        <h3>Data Pendaftar:</h3>
+        <p><strong>NIK:</strong> ${nik}</p>
+        <p><strong>Nama:</strong> ${nama}</p>
+        <p><strong>Alamat:</strong> ${alamat}</p>
+        <p><strong>Jenis Kelamin:</strong> ${gender}</p>
+      `;
+
+            document.getElementById("form-daftar").reset();
+        });
+        window.onload = () => {
+            getTime();
+            getWeather();
+        };
+    </script>
+
+</body>
+
+</html>

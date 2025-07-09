@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pilih Jadwal Kursus</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <audio id="background-audio" src="musik-latar.mp3" autoplay loop></audio>
+
+  <header>
+    <h1>Pilih Jadwal Kursus</h1>
+  </header>
+
+  <nav>
+    <a href="index.html">
+      <svg width="20" height="20" fill="white" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg> Home
+    </a>
+    <a href="daftar.html">
+      <svg width="20" height="20" fill="white" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg> Daftar Kursus
+    </a>
+    <a href="pilih.html">
+      <svg width="20" height="20" fill="white" viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zm0-5v2h12v-2H3zm0-5v2h18V7H3z"/></svg> Pilih Jadwal
+    </a>
+  </nav>
+
+  <main>
+    <form id="jadwal-form">
+      <label for="nama">Nama:</label>
+      <input type="text" id="nama" name="nama" required>
+
+      <label for="hari">Pilih Hari:</label>
+      <select id="hari" name="hari" required>
+        <option value="">--Pilih Hari--</option>
+        <option value="Senin">Senin</option>
+        <option value="Selasa">Selasa</option>
+        <option value="Rabu">Rabu</option>
+        <option value="Kamis">Kamis</option>
+        <option value="Jumat">Jumat</option>
+      </select>
+
+      <label for="jam">Pilih Waktu:</label>
+      <select id="jam" name="jam" required>
+        <option value="">--Pilih Waktu--</option>
+        <option value="08.00 - 10.00">08.00 - 10.00</option>
+        <option value="10.00 - 12.00">10.00 - 12.00</option>
+        <option value="13.00 - 15.00">13.00 - 15.00</option>
+        <option value="15.00 - 17.00">15.00 - 17.00</option>
+      </select>
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <div id="output"></div>
+
+    <div class="info-api">
+      <img src="media/jam.png" alt="Jam">
+      <span id="waktu">Memuat jam...</span>
+      <img src="cuaca-icon.png" alt="Cuaca" id="cuaca-icon" style="margin-left: 1rem;">
+      <span id="cuaca">Memuat cuaca...</span>
+    </div>
+
+    <div style="margin-top: 2rem;">
+      <a href="jadwal-kursus.pdf" download style="background: #33aaff; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">Download Jadwal Kursus (PDF)</a>
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2025 Kursus Online Adriel. All rights reserved.
+  </footer>
+
+  <script>
+    function getTime() {
+      setInterval(() => {
+        const waktu = new Date().toLocaleTimeString('id-ID', {
+          hour: '2-digit', minute: '2-digit', second: '2-digit'
+        });
+        document.getElementById("waktu").textContent = `Waktu : ${waktu}`;
+      }, 1000);
+    }
+
+    function getWeather() {
+      fetch('https://api.open-meteo.com/v1/forecast?latitude=-6.2&longitude=106.8&current_weather=true')
+        .then(response => response.json())
+        .then(data => {
+          const suhu = data.current_weather.temperature;
+          document.getElementById("cuaca").textContent = `Suhu : ${suhu}°C`;
+          document.getElementById("cuaca-icon").src = "https://cdn-icons-png.flaticon.com/512/869/869869.png";
+        })
+        .catch(() => {
+          document.getElementById("cuaca").textContent = "Gagal memuat cuaca";
+        });
+    }
+
+    document.getElementById("jadwal-form").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const nama = document.getElementById("nama").value;
+      const hari = document.getElementById("hari").value;
+      const jam = document.getElementById("jam").value;
+
+      const output = document.getElementById("output");
+      output.innerHTML = `
+        <h3>Jadwal Anda:</h3>
+        <p><strong>Nama:</strong> ${nama}</p>
+        <p><strong>Hari:</strong> ${hari}</p>
+        <p><strong>Waktu:</strong> ${jam}</p>
+      `;
+
+      document.getElementById("jadwal-form").reset();
+    });
+
+    window.onload = () => {
+      getTime();
+      getWeather();
+    };
+  </script>
+</body>
+</html>
